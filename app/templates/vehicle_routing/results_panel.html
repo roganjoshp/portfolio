@@ -1,0 +1,168 @@
+<div class="container-fluid content-row" id="set_problem_div">
+    <div class="row">
+        <div class="col col-lg-12">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Results</p>
+                    </h4>
+                </div>
+                <div class="card-body p-2">
+                    {% for driver_num in num_drivers %} {% if routes[driver_num] %}
+                    <div id="driver_div_{{ driver_num }}">
+                        <div class="container-fluid content-row">
+                            <center>
+                                <h4><b>Driver {{ driver_num }}'s Route</b></h4>
+                            </center>
+                            <div class="row align-items-stretch">
+                                <div class="col col-sm-6 d-flex">
+                                    <div class="card pb-0 h-100">
+                                        <div class="card-body flex-fill">
+                                            <div id="driver_route_div_{{ driver_num }}">
+                                                <table class="table table-sm" id="driver_route_{{ driver_num }}" style="width: 100%;">
+                                                    <thead>
+                                                        <th>#</th>
+                                                        <th style="font-size: 14px">Activity</th>
+                                                        <th style="font-size: 14px">Customer</th>
+                                                        <th style="font-size: 14px">Timeslot</th>
+                                                        <th style="font-size: 14px">Arrive</th>
+                                                        <th style="font-size: 14px">Depart</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for activity in routes[driver_num] %}
+                                                        <tr>
+                                                            <td style="font-size: 14px">{{ activity.job_id }}</td>
+                                                            <td style="font-size: 14px">{{ activity.activity }}</td>
+                                                            <td style="font-size: 14px">{{ activity.customer_name }}</td>
+                                                            <td style="font-size: 14px">{{ activity.slot_start }}-{{ activity.slot_end }}</td>
+                                                            <td style="font-size: 14px">{{ activity.arrival_time }}</td>
+                                                            <td style="font-size: 14px">{{ activity.departure_time }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col col-sm-6 d-flex">
+                                    <div class="card pb-0 h-100">
+                                        <div class="card-body flex-fill map-div" id="map_{{ driver_num }}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr> {% endif %} {% endfor %}
+					<center><h4><b>Route Data</b></h4></center>
+                    <table class="table table-sm" style="width: 100%" id="route_stats_table">
+                        <thead>
+                            <th>Name</th>
+                            <th>Driving Distance (km)</th>
+                            <th>Driving Time (mins)</th>
+                            <th>Waiting Time (mins)</th>
+                            <th>Had Lunch</th>
+                        </thead>
+                        <tbody>
+                            {% for driver_num in num_drivers %} {% if stats[driver_num] %}
+                            <tr>
+                                <td>Driver {{ driver_num }}</td>
+                                <td>{{ stats[driver_num]['distance'] }}</td>
+                                <td>{{ stats[driver_num]['time'] }}</td>
+                                <td>{{ stats[driver_num]['waiting'] }}</td>
+                                <td>{{ stats[driver_num]['had_lunch'] }}</td>
+                            </tr>
+                            {% endif %} {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% for driver_num in num_drivers %} {% if routes[driver_num] %}
+<script>
+    $(document).ready(function() {
+        $('#driver_route_{{ driver_num }}').DataTable({
+            "iDisplayLength": 10,
+            "scrollX": false,
+            "bLengthChange": false,
+            "aaSorting": [],
+            "searching": false,
+            "scrollCollapse": false,
+            "scrollY": "400px",
+            "info": false,
+            "responsive": true
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        var route = {{ routes[driver_num] | safe }};
+
+        var waypoint_list = [];
+        var names = [];
+        for (var i = 0; i < route.length; i++) {
+            var stop = route[i];
+            if (stop['activity'] != 'Lunch') {
+                waypoint_list.push(new L.latLng(stop['lat'], stop['lon']));
+                names.push(stop['customer_name'] + '\n' + stop['arrival_time']);
+            }
+        }
+
+        var num_waypoints = waypoint_list.length;
+        var this_map = L.map('map_{{ driver_num }}'),
+            waypoints = waypoint_list;
+
+        L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v8/tiles/{z}/{x}/{y}?access_token={{ mapbox_key }}', {
+            attribution: 'Map data &copy;<a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+        }).addTo(this_map);
+
+        var control = L.Routing.control({
+            plan: L.Routing.plan(waypoints, {
+                createMarker: function(j, wp) {
+                    if (j == num_waypoints - 1) {
+
+                        return L.marker(wp.latLng, {
+                            draggable: false,
+                            icon: L.divIcon({
+                                html: '<i class="fa fa-home"</i>',
+                                iconSize: [50, 50],
+                                className: 'myDivIcon',
+                                iconAnchor: [24, 35]
+                            }),
+                            title: 'Warehouse'
+                        });
+
+                    } else {
+                        return L.marker(wp.latLng, {
+                            draggable: false,
+                            icon: L.icon.glyph({
+                                glyph: j
+                            }),
+                            title: names[j]
+                        });
+                    }
+                },
+            }),
+            serviceUrl: "{{ leaflet_router }}"
+        }).addTo(this_map);
+        control.hide();
+    });
+</script>
+{% endif %} {% endfor %}
+<script>
+    $(document).ready(function() {
+        $('#route_stats_table').DataTable({
+            "iDisplayLength": 5,
+            "scrollX": false,
+            "bLengthChange": false,
+            "aaSorting": [],
+            "searching": false,
+            "scrollCollapse": false,
+            "info": false,
+            "responsive": true,
+			"paginate": false
+        });
+    });
+</script>

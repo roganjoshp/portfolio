@@ -1,0 +1,77 @@
+<div class="modal fade" id="routing_explanation" tabindex="-1" role="dialog" aria-labelledby="routing_explanation_label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <p class="header-font">Routing Explanation</p>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+             </button>
+            </div>
+            <div class="modal-body">
+                <h6><b>Overview</b></h6>
+                <p>
+                    The aim of an effective vehicle routing system is relatively simple; deliver as many parcels as possible with minimal cost. Achieving this goal, however, is an extremely complex mathematical problem (see
+                    <a href="https://en.wikipedia.org/wiki/Combinatorial_optimization" style="color: #265077;" target="_blank"><u>Combinatorial Optimization</u>
+                    </a>). For any problem encountered in the real world, it is impossible to find the <i>absolute best</i> solution in reasonable time but we can use heuristic approaches to find near-optimal solutions. That's what
+                    is demonstrated on this page.
+                </p>
+                <p>
+                    The top priority for this particular heuristic is to ensure the delivery of all parcels, above all financial costs. This means that it will use as many vehicles from the available fleet as is necessary, even when this may result in one delivery van carrying
+                    only a single item. Items must be delivered within their selected time slot. Once all parcels are delivered, the following costs are minimised:<br>
+                    <ul>
+                        <li><b>Fixed costs.</b> Every vehicle deployed in the solution will add a fixed cost of £100. This is to try minimise the number of vehicles used.</li>
+                        <li><b>Cost per km.</b> The algorithm considers a flat cost of £0.12/km (based on 30 miles/gallon and £1.25/litre of petrol).</li>
+                        <li><b>Cost per driving time.</b> The algorithm considers a flat driver wage cost of £0.17/min (based on £10/hr).</li>
+                        <li><b>Cost per waiting time.</b> Recall that all deliveries <u>must</u> be delivered in their alloted time window. This could mean that drivers are forced into situations where they have to wait for a time slot to open to continue
+                            deliveries - but they're still being paid!
+                        </li>
+                    </ul>
+                </p>
+                <hr>
+                <h6><b>Testing it Out</b></h6>
+                <p>
+                    Clicking on the "Create Routing Problem" will generate a random problem based on your specified criteria. Whilst you may see repeated customer names (I just use a pool of 200 names), all of the latitude/longitude pairs are random in the Greater Manchester
+                    area - no two problems should be the same and no problems are pre-solved. This means it's impossible to know what a solution will look like <i>a priori</i> and some may end up looking very unusual.
+                </p>
+                <p>
+                    However, the biggest impact you should see is in the effect of the delivery time window. Customers are demanding ever-smaller time slots for delivery (nobody likes waiting in all day for something to arrive), which is at odds with operational efficiency.
+                    Narrowing the time slots tends to:
+                    <ul>
+                        <li>cause drivers to have to criss-cross the city more often, increasing the overall mileage</li>
+                        <li>increase the likelihood of having to deploy more vehicles</li>
+                        <li>increase waiting time across all vehicles in the fleet</li>
+                        <li>decrease vehicle utilisation. Vehicles will be more likely to be deployed carrying fewer items, meaning that they may return to the depot even before they get to lunch time
+                        </li>
+                    </ul>
+                </p>
+                <hr>
+                <h6><b>Why is Lunch Optional?</b></h6>
+                <p>
+                    This is a bit tongue-in-cheek. When I first started using this algorithm, there was no way to factor in lunch breaks in routes. I worked with the library owner to make this a feature, for which I was
+                    <a href="https://github.com/graphhopper/jsprit/blob/master/CONTRIBUTORS.md" style="color: #265077;" target="_blank">
+                        <u>listed as a contributor</u>
+                    </a>. Hopefully that made things a little easier on the drivers!
+                    <hr>
+                    <h6><b>What else can it do?</b></h6>
+                    <p>
+                        This is just a demo, which only covers a small portion of what a full vehicle routing system needs to do. The full-blown version handles:
+                        <ul>
+                            <li>pickups from customers; sometimes things need to be returned</li>
+                            <li>1-1 transfers. Items can be picked up somewhere in a route and delivered elsewhere later on</li>
+                            <li>different vehicle capacities and running costs. Fleets might have vans and trucks that carry different things and cost different amounts to run
+                            </li>
+                            <li>vehicle requirements. For example, some items may need to be carried in refrigerated vehicles</li>
+                            <li>soft time windows. Maybe it's better to be late if there's no other way to cope, rather than just fail to make 100% of deliveries</li>
+                            <li>dynamic issues, such as orders being placed after the vehicle fleet is dispatched, or customers rescheduling on the same date</li>
+                        </ul>
+                        It's a huge undertaking to implement vehicle routing systems and beyond the scope of this demo.
+                    </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

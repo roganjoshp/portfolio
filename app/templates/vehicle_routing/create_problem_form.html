@@ -1,0 +1,50 @@
+<form method="post" action="{{ url_for('routing.create_problem') }}" id="create_problem_form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p>Create a unique vehicle routing problem by setting the parameters below. Locations and timeslots are chosen at random</p>
+    <div class="row align-items-center">
+        <div class="col col-xs-6 pl-0">Number of customers</div>
+        <div class="col col-xs-6 pr-0">
+            <select name="number_of_customers" id="number_of_customers" style="width: 100%" class="form-control">
+            {% for customer_number in customer_numbers %}
+            <option name="customer_number_selected" id="customer_number_selected" value="{{ customer_number }}">{{ customer_number }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col col-xs-6 pl-0">Max number of drivers</div>
+        <div class="col col-xs-6 pr-0">
+            <select name="number_of_drivers" id="number_of_drivers" style="width: 100%" class="form-control">
+            {% for driver_number in driver_numbers %}
+            <option name="driver_number_selected" id="driver_number_selected" value="{{ driver_number }}">{{ driver_number }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col col-xs-6 pl-0">Timeslot length (hrs)</div>
+        <div class="col col-xs-6 pr-0">
+            <select name="delivery_slot_length" id="delivery_slot_length" style="width: 100%" class="form-control">
+            {% for slot_length in slot_lengths %}
+            <option name="slot_length_selected" id="slot_length_selected" value="{{ slot_length }}">{{ slot_length }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col col-xs-6 pl-0">Drivers get breaks?</div>
+        <div class="col col-xs-6 pr-0">
+            <select name="driver_gets_break" id="driver_gets_break" style="width: 100%" class="form-control">
+            {% for driver_break in driver_break_options %}
+            <option name="driver_break_selected" id="driver_break_selected" value="{{ driver_break }}">{{ driver_break }}</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col col-xs-12 pl-0 pr-0">
+            <div id="create_problem_response_div"></div>
+            <input type="submit" class="btn btn-dark" style="width: 100%" value="Create problem">
+        </div>
+    </div>
+</form>

@@ -1,0 +1,37 @@
+<style>
+    .scrollable-menu {
+        height: auto;
+        max-height: 560px;
+        overflow-x: hidden;
+    }
+</style>
+
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <center><img src="{{ url_for('static', filename='img/profile.png') }}" width="60%"></img>
+        </center>
+        <br>
+        <h5>
+            <center>Josh Pilkington</center>
+        </h5>
+        <h6>
+            <center>Data Scientist</center>
+        </h6>
+    </div>
+    <ul class="list-unstyled components scrollable-menu">
+        <hr color="white" style="margin-top: 2px; margin-bottom: 2px">
+        <li>
+            <a href="{{ url_for('core.homepage') }}">Home</a>
+        </li>
+        <hr color="white" style="margin-top: 2px; margin-bottom: 2px">
+        <li>
+            <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Projects</a>
+            <ul class="collapse list-unstyled" id="pageSubmenu">
+                <li>
+                    <a href="{{ url_for('routing.homepage') }}">Vehicle Routing</a>
+                </li>
+            </ul>
+        </li>
+        <hr color="white" style="margin-top: 2px; margin-bottom: 2px">
+    </ul>
+</nav>

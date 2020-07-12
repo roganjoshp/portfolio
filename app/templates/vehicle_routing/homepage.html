@@ -1,0 +1,173 @@
+{% extends 'vehicle_routing/base.html' %} {% block content %}
+<link href="{{ url_for('static', filename='leaflet/leaflet.css') }}" rel="stylesheet" />
+<link href="{{ url_for('static', filename='leaflet-routing-machine/dist/leaflet-routing-machine.css') }}" rel="stylesheet" />
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Introduction</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p align="justify">
+                        The issue of efficient vehicle routing crops up all over the place. Initially a mainstay of large logistics companies (e.g.
+                        <a href="https://www.wired.com/2013/06/ups-astronomical-math/" style="color: #265077;" target="_blank">
+                            <u>UPS saved $30m a year for every 
+                        mile they shaved off delivery routes per day in 2013</u></a>), companies like Uber and Deliveroo have brought local-scale optimisation to the attention of consumers who now expect efficient service on
+                        their terms; usually as soon as possible but in a specified time slot. In addition to the service itself, there is also a need to consider the environmental impact of supply chains, and efficient routing has a strong role to play.
+                    </p>
+                    <p align="justify">
+                        The demands of the customer have to be balanced against the available resources of the company. A good chunk of my work has been not only in implementing the technical side of vehicle routing, but also in handling the reality of how customers behave,
+                        and adapting to dynamic situations (e.g. a customer not being immediately available but rescheduling a delivery).
+                    </p>
+                    <p align="justify">
+                        Below is an interactive vehicle routing system to see some a small example of the system in action. If you are curious about the more technical details on how this works, click
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#routing_explanation">
+                        here
+                        </button>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content-row" id="set_problem_div">
+    <div class="row">
+        <div class="col col-lg-12">
+            <div class="card border-dark">
+                <div class="card-body p-2">
+                    <div class="container-fluid content-row">
+                        <div class="row align-items-stretch">
+                            <div class="col col-lg-6 d-flex">
+                                <div class="card pb-0 h-100">
+                                    <div class="card-header">
+                                        <h4>
+                                            <p class="header-font">Parameters</p>
+                                        </h4>
+                                    </div>
+                                    <div class="card-body flex-fill">
+                                        {% include 'vehicle_routing/create_problem_form.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col col-lg-6 d-flex">
+                                <div class="card pb-0 h-100">
+                                    <div class="card-header">
+                                        <h4>
+                                            <p class="header-font">Problem View</p>
+                                        </h4>
+                                    </div>
+                                    <div class="card-body flex-fill map-div" id="map">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="solve_problem_div" style="display: none">
+                        <div class="container-fluid content-row">
+                            <div class="row">
+                                <div class="col col-lg-12">
+                                    <button class="btn btn-dark" style="width: 100%;" onclick="solveProblem()">Solve</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="routing_results_div"></div>
+{% include 'vehicle_routing/routing_explanation_modal.html' %}
+<script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='leaflet-routing-machine/dist/leaflet-routing-machine.js') }}"></script>
+<script src="https://unpkg.com/leaflet.icon.glyph@0.2.0/Leaflet.Icon.Glyph.js"></script>
+
+<!-- LOAD THE DEFAULT MAP VIEW -->
+<script>
+    var map = L.map('map').setView(new L.LatLng(53.479230, -2.243003), 10);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v8/tiles/{z}/{x}/{y}?access_token={{ mapbox_key }}', {
+        attribution: 'Map data &copy;<a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
+    }).addTo(map);
+
+    var control = L.Routing.control({
+        routeWhileDragging: true,
+        serviceUrl: "{{ leaflet_router }}"
+    }).addTo(map);
+    control.hide();
+</script>
+
+<!-- LOAD RANDOM LOCATIONS AND DISPLAY ON MAP -->
+<script>
+    var markers = L.layerGroup().addTo(map);
+
+    $("#create_problem_form").submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        $('#routing_results_div').empty();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form.serialize(),
+            context: form,
+            success: function(resp) {
+
+                if (resp['is_valid'] == true) {
+
+                    // Reset the map
+                    markers.clearLayers();
+                    map.setView(new L.LatLng(53.479230, -2.243003), 10);
+
+                    // Push the new markers
+                    for (i = 0; i < resp['locations'].length; i++) {
+                        var data = resp['locations'][i];
+                        var marker = L.marker([data['lat'], data['lon']], {
+                            'title': data['details']
+                        });
+                        marker.addTo(markers);
+                    }
+
+                    // Scroll to reveal the "solve" button
+                    $('#solve_problem_div').show();
+                    $("html, body").animate({
+                        scrollTop: $('#solve_problem_div').offset().top
+                    }, 700);
+                } else {
+                    $('#solve_problem_div').hide();
+                    markers.clearLayers();
+                }
+            }
+        });
+    });
+</script>
+<script>
+    function solveProblem() {
+        var csrf_token = "{{ csrf_token() }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            url: "{{ url_for('routing.solve_problem') }}",
+            success: function(resp) {
+                $('#routing_results_div').html(resp);
+                $("html, body").animate({
+                    scrollTop: $('#routing_results_div').offset().top
+                }, 700);
+            }
+        });
+    }
+</script>
+
+
+{% endblock %}

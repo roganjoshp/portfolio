@@ -1,0 +1,25 @@
+__pycache__/
+.vscode
+*.py[cod]
+*.log
+*.pkl
+*.db
+*.jar
+
+# pyenv
+.python-version
+app/requests*
+!app/requests/.gitkeep
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject

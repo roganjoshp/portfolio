@@ -1,0 +1,63 @@
+import csv
+import os
+import platform
+
+from dotenv import load_dotenv
+from flask import current_app
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
+
+
+class Config:
+    
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app/app.db')
+    
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SESSION_TYPE = 'sqlalchemy'
+    SESSION_SQLALCHEMY_TABLE = 'sessions'
+    
+    PERMANENT_SESSION_LIFETIME = 604800
+    WTF_CSRF_TIME_LIMIT = None
+    
+    SCHEDULER_API_ENABLED = True
+    
+    # VEHICLE ROUTING PARAMS
+    
+    MIN_LAT = 53.384
+    MAX_LAT = 53.573
+    MIN_LON = -2.398
+    MAX_LON = -2.065
+
+    WH_LAT = 53.470795
+    WH_LON = -2.327794
+
+    NUM_CUSTOMERS = list(range(10, 110, 10))
+    NUM_DRIVERS = list(range(1, 6))
+    TIME_SLOTS = list(range(1, 6))
+    DRIVER_BREAKS = ['Yes', 'No']
+    
+    START_TIMES = [540, 600, 660, 720, 780, 840, 900] # Mins past midnight
+
+    OSRM_BASE = os.environ.get('OSRM_BASE')
+    OSRM_END = '?annotations=distance,duration'
+    
+    LEAFLET_SERVER = os.environ.get('LEAFLET_ROUTING_SERVER')
+    MAPBOX_KEY = os.environ.get('MAPBOX_KEY')
+    JSPRIT_SOCKET = os.environ.get('JSPRIT_SOCKET')
+    REQUEST_PATH = os.path.join(basedir, 'app/requests')
+    
+    @staticmethod
+    def load_customer_names():
+        """ Pre-load the static customer names for the routing problems """
+        
+        path = os.path.join(basedir, 'app/static/files/random_names.csv')
+        with open(path) as infile:
+            reader = csv.reader(infile)
+            names = list(set([' '.join(sublist) for sublist in reader]))
+        return names
+    
+    
