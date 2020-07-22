@@ -15,5 +15,13 @@ def update_machine_status():
 
 @bp.route('/homepage', methods=['GET'])
 def homepage():
-    current_status = Machines.get_status()
-    return render_template('manufacturing/homepage.html')
+    ptv_status = Machines.get_current_status()
+    return render_template('manufacturing/homepage.html',
+                           ptv_status=ptv_status)
+    
+
+@bp.route('/get_ptv_update', methods=['POST'])
+def get_ptv_update():
+    ptv_status = Machines.get_current_status()
+    return render_template('manufacturing/ptv_screen.html',
+                           ptv_status=ptv_status)

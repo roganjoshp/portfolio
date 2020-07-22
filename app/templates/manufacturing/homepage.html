@@ -54,8 +54,9 @@
                                 </div>
                                 <div class="col col-sm-6 d-flex">
                                     <div class="card pb-0 h-100">
-                                        <div class="card-body flex-fill" style="background-color: #4B4B4A;">Else</div>
-                                        {% include 'manufacturing/ptv_screen.html' %}
+                                        <div class="card-body flex-fill" style="background-color: #4B4B4A;">
+                                            <div id="ptv_div">{% include 'manufacturing/ptv_screen.html' %}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -66,4 +67,30 @@
         </div>
     </div>
 </div>
+<script>
+    function call_update() {
+
+        var csrf_token = "{{ csrf_token() }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+
+        $.ajax({
+            method: "POST",
+            url: "{{ url_for('manufacturing.get_ptv_update') }}",
+            data: {},
+            success: function(data) {
+                $('#ptv_div').html(data);
+            }
+        })
+        setTimeout(call_update, 3000);
+    };
+    call_update();
+</script>
+
 {% endblock %}

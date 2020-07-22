@@ -106,26 +106,28 @@ class Machines(db.Model):
     @staticmethod
     def get_current_status():
          
-        rtn = {}
+        rtn = []
          
         machines = Machines.query.order_by(Machines.name).all()
         for machine in machines:
             is_down = machine.status.is_down
             if is_down:
-                total_secs_down = (dt.datetime.utcnow() 
-                                   - machine.status.last_down).total_seconds()
+                total_secs_down = int((dt.datetime.utcnow() 
+                                   - machine.status.last_down).total_seconds())
                 mins_down = total_secs_down // 60
-                secs_down = (total_secs_down - (mins_down * 60) % 60)
+                secs_down = (total_secs_down - mins_down * 60) % 60
             else:
-                mins_down, secs_down = 0
+                mins_down = 0
+                secs_down = 0
             
-            machine_dict = {'is_down': is_down,
+            machine_dict = {'machine_name': machine.name,
+                            'is_down': is_down,
                             'secs_down': secs_down,
                             'mins_down': mins_down,
                             'prod_count': machine.status.hourly_product_count,
                             'down_count': machine.status.hourly_down_count}
             
-            rtn[machine.name] = machine_dict
+            rtn.append(machine_dict)
         
         return rtn
               
@@ -230,15 +232,15 @@ class Machines(db.Model):
     def _set_status():
         machines = Machines.query.all()
         
+        # Take the last history reading, scale for the current minute and
+        # set as current status
+        scaler = dt.datetime.utcnow().minute / 60
+        
         for machine in machines:
-            # Take the last history reading, scale for the current minute and
-            # set as current status
-            
             history = (MachineHistory.query
                                      .filter_by(machine_id=machine.id)
                                      .order_by(MachineHistory.datetime.desc())
                                      .first())
-            scaler = dt.datetime.utcnow().minute
             
             status = CurrentMachineStatus(
                         machine_id=machine.id,
