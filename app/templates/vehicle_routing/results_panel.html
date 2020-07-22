@@ -54,7 +54,9 @@
                         </div>
                     </div>
                     <hr> {% endif %} {% endfor %}
-					<center><h4><b>Route Data</b></h4></center>
+                    <center>
+                        <h4><b>Route Data</b></h4>
+                    </center>
                     <table class="table table-sm" style="width: 100%" id="route_stats_table">
                         <thead>
                             <th>Name</th>
@@ -98,7 +100,11 @@
 </script>
 <script>
     $(document).ready(function() {
-        var route = {{ routes[driver_num] | safe }};
+        var route = {
+            {
+                routes[driver_num] | safe
+            }
+        };
 
         var waypoint_list = [];
         var names = [];
@@ -162,7 +168,7 @@
             "scrollCollapse": false,
             "info": false,
             "responsive": true,
-			"paginate": false
+            "paginate": false
         });
     });
 </script>

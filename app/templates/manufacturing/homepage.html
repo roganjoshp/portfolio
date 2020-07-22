@@ -1,0 +1,69 @@
+{% extends 'manufacturing/base.html' %} {% block content %}
+
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Introduction</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p align="justify">
+                        The Internet of Things (IoT) era presents many opportunities, not just
+                        <a href="https://www.techtimes.com/articles/183339/20161024/massive-dyn-ddos-attack-experts-blame-smart-fridges-dvrs-and-other-iot-devices-why-your-internet-went-down.htm" style="color: #265077;" target="_blank">
+                            <u>pseudo-sentient fridges trying to bring down the internet</u></a>. Indeed, we can monitor machine activity in real-time to alert operators to immediate problems, track production or the frequency of issues over time, and
+                        predict the likelihood of meeting targets in the future. What's more, this approach is extensible; you can start with the isolated case of planning machine production, then start to trace back towards optimising the supply chain
+                        for raw materials, ensuring you place orders at the optimal time to avoid stockpiling.
+                    </p>
+                    <p align="justify">
+                        The example below is a brief demonstration of how the data might be collected from real-time monitoring and then utilised to inform decisions on how best to utilise equipment in the short-term to maximise long-term targets.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content-row" id="set_problem_div">
+    <div class="row">
+        <div class="col col-lg-12">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Real-Time Monitoring</p>
+                    </h4>
+                </div>
+                <div class="card-body p-2">
+                    <div id="driver_div_{{ driver_num }}">
+                        <div class="container-fluid content-row">
+                            <div class="row align-items-stretch">
+                                <div class="col col-sm-6 d-flex">
+                                    <div class="card pb-0 h-100">
+                                        <div class="card-body flex-fill">
+                                            <p align="justify">The first stage of simulating production is the collection of real-time data. Fitting machines with sensors provides a product count and the machine status, which can be recorded in the installed programmable
+                                                logic controller (PLC). This, in turn, can be read and displayed on the shop floor via TV screens (using a
+                                                <a href="https://www.redlion.net/sites/default/files/137/4190/ProducTVity%20Station%20Brochure.pdf" style="color: #265077;" target="_blank"><u>PTV</u>
+                                                </a>, for example, or even just a Raspberry Pi).
+                                            </p>
+                                            <p align="justify">In addition to providing immediate feedback to machine operators and supervisors, it's also possible to collect and record machine performance over any period. This allows for reviewing the success of any preventative
+                                                maintenance programmes or new initiatives.The machines here are fictitious and maybe a little exaggerated in the frequency of their downtime; the code for their activity is.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col col-sm-6 d-flex">
+                                    <div class="card pb-0 h-100">
+                                        <div class="card-body flex-fill" style="background-color: #4B4B4A;">Else</div>
+                                        {% include 'manufacturing/ptv_screen.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

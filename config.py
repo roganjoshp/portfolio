@@ -14,7 +14,8 @@ class Config:
     
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app/app.db')
+    DB_PATH = 'app/app.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, DB_PATH)
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'sqlalchemy'
@@ -60,4 +61,33 @@ class Config:
             names = list(set([' '.join(sublist) for sublist in reader]))
         return names
     
+    # PRODUCTION SCHEDULING PARAMS
+    
+    SCHEDULER_API_ENABLED = True
+    
+    MACHINE_STATS = {
+         1: {'ideal_run_rate': 100,
+             'efficiency': 0.85,
+             'min_downtime_secs': 20,
+             'downtime_probability': 0.04,
+             'restart_probability': 0.3},
+         2: {'ideal_run_rate': 100,
+             'efficiency': 0.9,
+             'min_downtime_secs': 120,
+             'downtime_probability': 0.02,
+             'restart_probability': 0.3},
+         3: {'ideal_run_rate': 100,
+             'efficiency': 0.75,
+             'min_downtime_secs': 50,
+             'downtime_probability': 0.01,
+             'restart_probability': 0.3},
+         4: {'ideal_run_rate': 100,
+             'efficiency': 0.6,
+             'min_downtime_secs': 10,
+             'downtime_probability': 0.06,
+             'restart_probability': 0.3}
+         }
+        
+    # How often to generate new machine data and update in real-time on frontend
+    UPDATE_CYCLE_SECS = 3
     

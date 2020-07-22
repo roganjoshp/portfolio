@@ -50,9 +50,9 @@ def solve_problem():
     if locations:
         solver = RoutingProblem(locations, params)
         routes, stats = solver.solve_route()
-    import json
+
     num_drivers = current_app.config['NUM_DRIVERS']
-    print(stats)
+
     return render_template('vehicle_routing/results_panel.html',
                            num_drivers=num_drivers,
                            routes=routes, 
