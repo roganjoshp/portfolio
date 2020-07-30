@@ -50,4 +50,5 @@ def plot_historical_data():
 @bp.route('/create_problem', methods=['POST'])
 def create_problem():
     problem = Problem(request.form)
+    problem.parse_request()
     return "done"

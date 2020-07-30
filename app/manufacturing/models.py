@@ -362,11 +362,19 @@ class Problem:
     
     def parse_request(self):
         
+        products = {}
+        
         # First pull out the product list
         for i, machine in enumerate(current_app.config['MACHINE_NAMES']):
-            product_list = request.get('machine_{}_products')
-            print(product_list)
-    
+            product_list = self.req.getlist(f'machine_{i}_products[]')
+            try:
+                # The options should only come from a pre-defined dropdown.
+                # Either the list is empty or it should be possible to split and
+                # grab an int.
+                product_list = [int(item.split()[1]) for item in product_list]
+            except Exception:
+                return False
+          
     @staticmethod
     def create_forecast():
         forecast = []
