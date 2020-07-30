@@ -55,6 +55,78 @@ class MachineHistory(db.Model):
     down_count = db.Column(db.Integer)
     down_secs = db.Column(db.Integer)
     
+    @staticmethod
+    def get_plots(stat):
+        
+        allowed_stats = ('product_count', 'down_count', 'down_secs', 'oee')
+        if stat not in allowed_stats:
+            # Assume injection attempt and abort
+            return {}
+        
+        rtn = {}
+        
+        if stat != 'oee':
+            stat_name = stat
+        else:
+            # We need to scale this to ideal runrate
+            stat_name = 'product_count'
+        
+        # Pass query off to raw, to avoid ORM overhead. No need for it here
+        data = db.session.execute(
+                      f"""
+                       SELECT machines.name AS name, 
+                              machine_history.datetime,
+                              machine_history.{stat_name} 
+                       FROM machine_history
+                       JOIN machines ON machines.id = machine_history.machine_id
+                       ORDER BY name, machine_history.datetime
+                       """
+                       ).fetchall()
+            
+        df = pd.DataFrame(data, columns=['name', 'datetime', 'value'])
+        
+        if stat == 'oee':
+            ideal_run_rates = db.session.execute(
+                         """
+                         SELECT machines.name AS name,
+                                machine_stats.ideal_run_rate
+                         FROM machine_stats
+                         JOIN machines ON machines.id = machine_stats.machine_id
+                         """
+                         ).fetchall()
+            
+            mapper = {name: run_rate * 60 for name, run_rate in ideal_run_rates}
+            df['value'] = df.apply(lambda x: x['value'] / mapper.get(x['name']),
+                                   axis=1)
+            df['value'] *= 100
+        
+        max_val = 0
+        
+        # Make JSON serializable
+        for name, data in df.groupby('name'):
+            rtn[name] = {'datetimes': data['datetime'].tolist(),
+                         'plot_values': data['value'].astype(int).tolist()}
+            if data['value'].max() > max_val:
+                max_val = data['value'].max()
+        
+        stat_map = {'product_count': {'title': 'Product Count',
+                                      'x_axis': 'Datetime',
+                                      'y_axis': 'Items Produced'},
+                    'down_count':    {'title': 'Machine Stoppages',
+                                      'x_axis': 'Datetime',
+                                      'y_axis': 'Hourly Machine Stoppages'},
+                    'down_secs':     {'title': 'Machine Downtime',
+                                      'x_axis': 'Datetime',
+                                      'y_axis': 'Hourly Downtime (secs)'},
+                    'oee':           {'title': 'Operational Efficiency',
+                                      'x_axis': 'Datetime',
+                                      'y_axis': 'Operational Efficiency (%)'}
+                    }
+        rtn['chart_details'] = stat_map[stat]
+        rtn['max_val'] = max_val  
+         
+        return rtn
+
 
 class CurrentMachineStatus(db.Model):
     
@@ -281,3 +353,30 @@ class Machines(db.Model):
         Machines._backdate_production()
         db.session.commit()
         Machines._set_status()
+        
+
+class Problem:
+    
+    def __init__(self, request):
+        self.req = request
+    
+    def parse_request(self):
+        
+        # First pull out the product list
+        for i, machine in enumerate(current_app.config['MACHINE_NAMES']):
+            product_list = request.get('machine_{}_products')
+            print(product_list)
+    
+    @staticmethod
+    def create_forecast():
+        forecast = []
+        for product in current_app.config['PRODUCT_NAMES']:
+            forecast.append([
+                    product,
+                    random.randint(50, 200) if random.random() > 0.4 else 0,
+                    random.randint(50, 200) if random.random() > 0.4 else 0,
+                    random.randint(50, 200) if random.random() > 0.4 else 0,
+                    random.randint(50, 200) if random.random() > 0.4 else 0
+                    ])
+        
+        return forecast

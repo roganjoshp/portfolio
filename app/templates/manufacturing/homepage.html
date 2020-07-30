@@ -1,5 +1,5 @@
 {% extends 'manufacturing/base.html' %} {% block content %}
-
+<script src="{{ url_for('static', filename='js/plotly.min.js') }}"></script>
 <div class="container-fluid content-row">
     <div class="row">
         <div class="col col-xs-12">
@@ -25,37 +25,90 @@
         </div>
     </div>
 </div>
-<div class="container-fluid content-row" id="set_problem_div">
+<div class="container-fluid content-row">
     <div class="row">
-        <div class="col col-lg-12">
+        <div class="col-sm m-0">
             <div class="card border-dark">
                 <div class="card-header">
                     <h4>
                         <p class="header-font">Real-Time Monitoring</p>
                     </h4>
                 </div>
-                <div class="card-body p-2">
-                    <div id="driver_div_{{ driver_num }}">
-                        <div class="container-fluid content-row">
-                            <div class="row align-items-stretch">
-                                <div class="col col-sm-6 d-flex">
-                                    <div class="card pb-0 h-100">
-                                        <div class="card-body flex-fill">
-                                            <p align="justify">The first stage of simulating production is the collection of real-time data. Fitting machines with sensors provides a product count and the machine status, which can be recorded in the installed programmable
-                                                logic controller (PLC). This, in turn, can be read and displayed on the shop floor via TV screens (using a
-                                                <a href="https://www.redlion.net/sites/default/files/137/4190/ProducTVity%20Station%20Brochure.pdf" style="color: #265077;" target="_blank"><u>PTV</u>
-                                                </a>, for example, or even just a Raspberry Pi).
-                                            </p>
-                                            <p align="justify">In addition to providing immediate feedback to machine operators and supervisors, it's also possible to collect and record machine performance over any period. This allows for reviewing the success of any preventative
-                                                maintenance programmes or new initiatives.The machines here are fictitious and maybe a little exaggerated in the frequency of their downtime; the code for their activity is.
-                                            </p>
-                                        </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg pl-lg-0 pr-lg-2 pt-lg-0 pb-lg-0 pb-2 p-0">
+                                <div class="card border-dark h-100 flex-fill">
+                                    <div class="card-body">
+                                        <p align="justify">The first stage of simulating production is the collection of real-time data. Fitting machines with sensors provides a product count and the machine status, which can be recorded in the installed programmable logic
+                                            controller (PLC). This, in turn, can be read and displayed on the shop floor via TV screens (using a
+                                            <a href="https://www.redlion.net/sites/default/files/137/4190/ProducTVity%20Station%20Brochure.pdf" style="color: #265077;" target="_blank"><u>PTV</u>
+                                            </a>, for example, or even just a Raspberry Pi).
+                                        </p>
+                                        <p align="justify">In addition to providing immediate feedback to machine operators and supervisors, it's also possible to collect and record machine performance over any period. This allows for reviewing the success of any preventative
+                                            maintenance programmes or new initiatives.The machines here are fictitious and maybe a little exaggerated in the frequency of their downtime; the code for their activity is.
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="col col-sm-6 d-flex">
-                                    <div class="card pb-0 h-100">
-                                        <div class="card-body flex-fill" style="background-color: #4B4B4A;">
-                                            <div id="ptv_div">{% include 'manufacturing/ptv_screen.html' %}</div>
+                            </div>
+                            <div class="col-lg p-0 pl-lg-2 pt-lg-0 pt-2">
+                                <div class="card border-dark h-100 flex-fill">
+                                    <div class="card-body" style="background-color: #4B4B4A;">
+                                        <div id="ptv_div">{% include 'manufacturing/ptv_screen.html' %}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col-sm m-0">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Performance Review</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg pl-lg-0 pr-lg-2 pt-lg-0 pb-lg-0 pb-2 p-0">
+                                <div class="card border-dark h-100 flex-fill">
+                                    <div class="card-body">
+                                        <div id="machine_history_div"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg p-0 pl-lg-2 pt-lg-0 pt-2">
+                                <div class="card border-dark h-100 flex-fill">
+                                    <div class="card-body">
+                                        <p align="justify">Once the issue of real-time monitoring is addressed, attention can turn to performance review. Which machines are causing the most issues? Can a new policy of planned, preventative maintenance (PPM) address these
+                                            issues or is there a need for more training for operators? Such questions can only be answered by having data, and all the historical data from real-time monitoring can be backed up for analysis.
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-12 pl-0 pr-0">
+                                                <button class="btn btn-dark" style="width: 100%" onclick="plot_stat('product_count')">Product Count</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 pl-0 pr-0">
+                                                <button class="btn btn-dark" style="width: 100%" onclick="plot_stat('down_count')">Number of Times Offline</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 pl-0 pr-0">
+                                                <button class="btn btn-dark" style="width: 100%" onclick="plot_stat('down_secs')">Total Downtime</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12 pl-0 pr-0">
+                                                <button class="btn btn-dark" style="width: 100%" onclick="plot_stat('oee')">Overall Equipment Effectiveness</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -67,6 +120,33 @@
         </div>
     </div>
 </div>
+{% include 'manufacturing/production_simulation_setup.html' %}
+<script>
+    function plot_stat(stat_name) {
+        var csrf_token = "{{ csrf_token() }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({
+                'stat': stat_name,
+            }),
+            contentType: 'application/json; charset=utf-8',
+            url: "{{ url_for('manufacturing.plot_historical_data') }}",
+            success: function(data) {
+                $('#machine_history_div').html(data);
+            }
+        });
+
+    }
+</script>
 <script>
     function call_update() {
 
@@ -92,5 +172,70 @@
     };
     call_update();
 </script>
+<script>
 
+    var max_val = 1.1 * {{ plot.max_val }};
+
+    var traces = [];
+    
+    {% for machine_name, plot_data in plot.items() %} 
+    
+	{% if machine_name not in ('chart_details', 'max_val') %} 
+	{% if loop.index0 == 0 %}
+    var trace = {
+        x: {{ plot_data.datetimes | safe }},
+        y: {{ plot_data['plot_values'] | safe }},
+        type: 'scatter',
+        name: "{{ machine_name }}"
+    };
+    traces.push(trace); 
+	
+	{% else %}
+	
+    var trace = {
+        x: {{ plot_data.datetimes | safe }},
+        y: {{ plot_data['plot_values'] | safe }},
+        type: 'scatter',
+        name: "{{ machine_name }}",
+        visible: 'legendonly'
+    };
+    traces.push(trace); 
+	{% endif %} 
+	{% endif %} 
+	{% endfor %}
+
+
+    var layout = {
+        title: "{{ plot.chart_details.title }}",
+
+        xaxis: {
+            title: "{{ plot.chart_details.x_axis }}",
+            'nticks': 3,
+            'tickformat': '%Y-%m-%d %H:%M'
+        },
+        yaxis: {
+            title: "{{ plot.chart_details.y_axis }}",
+            range: [0, max_val],
+        },
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#fafafa',
+        showlegend: true,
+        legend: {
+            x: 0.7,
+            y: 0.1
+        },
+        margin: {
+            l: 50,
+            r: 0,
+            b: 50,
+            t: 30,
+            pad: 4
+        }
+    };
+
+    Plotly.newPlot('machine_history_div', traces, layout, {
+        displayModeBar: false,
+
+    });
+</script>
 {% endblock %}

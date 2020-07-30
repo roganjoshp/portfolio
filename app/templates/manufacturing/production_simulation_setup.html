@@ -1,0 +1,117 @@
+<form method="post" action="{{ url_for('manufacturing.create_problem') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="container-fluid content-row">
+        <div class="row">
+            <div class="col-sm m-0">
+                <div class="card border-dark">
+                    <div class="card-header">
+                        <h4>
+                            <p class="header-font">Production Planning</p>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p align="justify">
+                            Whilst it's useful to be able to review machine productivity over time, there are ways in which this data can be put to work. In the example below, we can imagine a fast-moving consumer goods (FMCG) manufacturer that uses machines A through D to make
+                            a variety of products, and the company has a sales forecast that it must work towards. Each of the machines can make any arbitrary subset of the product catalogue and the question then becomes; how do they utilise their assets
+                            in order to meet the sales forecast in the most efficient way, minimising the chance of failing to meet an order? This is an example of the Job shop scheduling problem and we can build a model to answer this question. </p>
+                        <p align="justify">In the panels below, you can make changes to the problem setup and try and solve the problem. You can define which machines make which products, alter the shift patterns of the machines, and define the sales forecast for the coming
+                            month. The model will use the production history recorded above in order to determine the output of each machine.
+                        </p>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg pl-lg-0 pr-lg-2 pt-lg-0 pb-lg-0 pb-2 p-0">
+                                    <div class="card border-dark h-100 flex-fill">
+                                        <div class="card-body">
+                                            <center>Set the shift patterns of the machines</center>
+                                            <hr> {% for machine in machines %}
+                                            <div class="row align-items-center">
+                                                <div class="col col-xs-6 pl-0">
+                                                    {{ machine }}
+                                                </div>
+                                                <div class="col col-xs-6 pr-0">
+                                                    <select class="form-control" name="shift_pattern_{{ machine }}" style="width: 100%">
+                                                    <option name="selected_pattern" value=""></option>
+                                                    {% for shift_pattern in shifts %}#
+                                                    <option name="selected_pattern" value="{{ shift_pattern }}">{{ shift_pattern }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg p-0 pl-lg-2 pt-lg-0 pt-2">
+                                    <div class="card border-dark h-100 flex-fill">
+                                        <div class="card-body">
+                                            <center>Set the product(s) that each machine can produce</center>
+                                            <hr> {% for machine in machines %}
+                                            <div class="row align-items-center">
+                                                <div class="col col-xs-6 pl-0">
+                                                    {{ machine }}
+                                                </div>
+                                                <div class="col col-xs-6 pr-0">
+                                                    <select class="multi_dropdown" name="machine_{{ loop.index0 }}_products[]" multiple="multiple" style="width: 100%">
+                                                        <option name="selected_product" value=""></option>
+                                                        {% for product in products %}#
+                                                        <option name="selected_product" value="{{ product }}">{{ product }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg pt-4 pl-0 pr-0">
+                                    <div class="card border-dark h-100 flex-fill">
+                                        <div class="card-body">
+                                            <center>Set the sales forecast for the next month</center>
+                                            <hr>
+                                            <table class="table table-bordered table-sm table-striped" style="width: 100%">
+                                                <thead>
+                                                    <th>Product Name</th>
+                                                    <th>Week 1</th>
+                                                    <th>Week 2</th>
+                                                    <th>Week 3</th>
+                                                    <th>Week 4</th>
+                                                </thead>
+                                                <tbody>
+                                                    {% for row in forecast %}
+                                                    <tr>
+                                                        {% for item in row %} {% if loop.index0 > 0 %}
+                                                        <td>
+                                                            <div contenteditable>{{ item }}</div>
+                                                        </td>
+                                                        {% else %}
+                                                        <td>{{ item }}</td>
+                                                        {% endif %} {% endfor %}
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg pt-2 pb-0 pl-0 pr-0">
+
+                                    <button class="btn btn-dark" style="width: 100%">Create Problem</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    $(document).ready(function() {
+        $('.multi_dropdown').select2();
+    });
+</script>

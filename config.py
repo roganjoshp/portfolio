@@ -1,6 +1,7 @@
 import csv
 import os
 import platform
+import string
 
 from dotenv import load_dotenv
 from flask import current_app
@@ -90,4 +91,8 @@ class Config:
         
     # How often to generate new machine data and update in real-time on frontend
     UPDATE_CYCLE_SECS = 3
+    
+    SHIFT_PATTERNS = ['6-2', '2-10', '6-2 and 2-10']
+    MACHINE_NAMES = [f'Machine {x}' for x in string.ascii_uppercase[:4]]
+    PRODUCT_NAMES = [f'Product {x}' for x in range(1, 9)]
     

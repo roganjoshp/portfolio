@@ -1,0 +1,64 @@
+ <script>
+
+    var max_val = 1.1 * {{ plot.max_val }};
+
+    var traces = [];
+    
+    {% for machine_name, plot_data in plot.items() %} 
+    
+	{% if machine_name not in ('chart_details', 'max_val') %} 
+	{% if loop.index0 == 0 %}
+    var trace = {
+        x: {{ plot_data.datetimes | safe }},
+        y: {{ plot_data['plot_values'] | safe }},
+        type: 'scatter',
+        name: "{{ machine_name }}"
+    };
+    traces.push(trace); 
+	
+	{% else %}
+	
+    var trace = {
+        x: {{ plot_data.datetimes | safe }},
+        y: {{ plot_data['plot_values'] | safe }},
+        type: 'scatter',
+        name: "{{ machine_name }}",
+        visible: 'legendonly'
+    };
+    traces.push(trace); 
+	{% endif %} 
+	{% endif %} 
+	{% endfor %}
+
+    var layout = {
+        title: "{{ plot.chart_details.title }}",
+
+        xaxis: {
+            title: "{{ plot.chart_details.x_axis }}",
+            'nticks': 3,
+            'tickformat': '%Y-%m-%d %H:%M'
+        },
+        yaxis: {
+            title: "{{ plot.chart_details.y_axis }}",
+            range: [0, max_val],
+        },
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#fafafa',
+        showlegend: true,
+        legend: {
+            x: 0.7,
+            y: 0.1
+        },
+        margin: {
+            l: 80,
+            r: 0,
+            b: 50,
+            t: 30,
+            pad: 4
+        }
+    };
+
+    Plotly.newPlot('machine_history_div', traces, layout, {
+        displayModeBar: false
+    });
+</script>

@@ -55,5 +55,5 @@ def solve_problem():
 
     return render_template('vehicle_routing/results_panel.html',
                            num_drivers=num_drivers,
-                           routes=routes, 
+                           routes=routes,
                            stats=stats)
