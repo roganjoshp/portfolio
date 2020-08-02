@@ -1,4 +1,4 @@
-<form method="post" action="{{ url_for('manufacturing.create_problem') }}">
+<form method="post" action="{{ url_for('manufacturing.create_problem') }}" id="create_problem_form" name="create_problem_form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="container-fluid content-row">
         <div class="row">
@@ -70,28 +70,30 @@
                                         <div class="card-body">
                                             <center>Set the sales forecast for the next month</center>
                                             <hr>
-                                            <table class="table table-bordered table-sm table-striped" style="width: 100%">
-                                                <thead>
-                                                    <th>Product Name</th>
-                                                    <th>Week 1</th>
-                                                    <th>Week 2</th>
-                                                    <th>Week 3</th>
-                                                    <th>Week 4</th>
-                                                </thead>
-                                                <tbody>
-                                                    {% for row in forecast %}
-                                                    <tr>
-                                                        {% for item in row %} {% if loop.index0 > 0 %}
-                                                        <td>
-                                                            <div contenteditable>{{ item }}</div>
-                                                        </td>
-                                                        {% else %}
-                                                        <td>{{ item }}</td>
-                                                        {% endif %} {% endfor %}
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
+                                            <div id="forecast_table_div">
+                                                <table class="table table-bordered table-sm table-striped" style="width: 100%">
+                                                    <thead>
+                                                        <th>Product Name</th>
+                                                        <th>Week 1</th>
+                                                        <th>Week 2</th>
+                                                        <th>Week 3</th>
+                                                        <th>Week 4</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for row in forecast %}
+                                                        <tr>
+                                                            {% for item in row %} {% if loop.index0 > 0 %}
+                                                            <td>
+                                                                <div contenteditable>{{ item }}</div>
+                                                            </td>
+                                                            {% else %}
+                                                            <td>{{ item }}</td>
+                                                            {% endif %} {% endfor %}
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -108,6 +110,31 @@
         </div>
     </div>
 </form>
+
+<script>
+    $("#create_problem_form").submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+
+        var form_data = form.serializeArray();
+        form_data.push({
+            name: "finalised_forecast_table",
+            value: document.getElementById("forecast_table_div").innerHTML
+        });
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: form_data,
+            context: form,
+            success: function(resp) {
+                $("#dynamic_div").html(resp);
+            }
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function() {
         $('.multi_dropdown').select2();

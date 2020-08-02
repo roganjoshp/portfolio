@@ -2,6 +2,8 @@ import random
 import sqlite3
 
 from flask import current_app
+from sqlalchemy import and_
+from sqlalchemy.sql import func
 
 from app import db
 
@@ -126,7 +128,7 @@ class MachineHistory(db.Model):
         rtn['max_val'] = max_val  
          
         return rtn
-
+    
 
 class CurrentMachineStatus(db.Model):
     
@@ -174,7 +176,17 @@ class Machines(db.Model):
                 self.status.hourly_product_count += int(noise * per_tick_prod)
                 
         db.session.commit()
-        
+    
+    def get_average_hourly_production(self, lookback_weeks=4):
+        MH = MachineHistory
+        history = (db.session.query(func.avg(MH.product_count))
+                     .filter(and_(MH.machine_id==self.id,
+                                  MH.product_count > 0))
+                     .first())
+        if history is not None:
+            return history[0]
+        return history
+    
     @staticmethod
     def get_current_status():
          
@@ -353,16 +365,30 @@ class Machines(db.Model):
         Machines._backdate_production()
         db.session.commit()
         Machines._set_status()
+    
+    @staticmethod
+    def get_all():
+        return Machines.query.order_by('name').all()
+   
         
-
 class Problem:
     
     def __init__(self, request):
         self.req = request
+        
+        self.machine_products = {} # Product capabilities of each machine
+        self.machines = Machines.get_all()
+        self.machine_productivity = {}
+        self.machine_shifts = {}
+        
+        self.forecast = {}
+        self.daterange = None
     
     def parse_request(self):
         
-        products = {}
+        valid_product_ids = set([int(item.split()[1]) 
+                               for item in current_app.config['PRODUCT_NAMES']])
+        valid_shift_names = set(current_app.config['SHIFT_HOURS'].keys())
         
         # First pull out the product list
         for i, machine in enumerate(current_app.config['MACHINE_NAMES']):
@@ -370,11 +396,61 @@ class Problem:
             try:
                 # The options should only come from a pre-defined dropdown.
                 # Either the list is empty or it should be possible to split and
-                # grab an int.
+                # grab an int. Anything else is not to be trusted
                 product_list = [int(item.split()[1]) for item in product_list]
+                if any(item not in valid_product_ids for item in product_list):
+                    return False
+                self.machine_products[self.machines[i].id] = product_list
+                self.machine_productivity[self.machines[i].id] = (
+                                self.machines[i].get_average_hourly_production()
+                                )
             except Exception:
                 return False
-          
+            
+        # Grab the shift pattern hours
+        for i, machine in enumerate(current_app.config['MACHINE_NAMES']):
+            shift_name = self.req.get(f'shift_pattern_{machine}')
+            if shift_name and shift_name in valid_shift_names:
+                self.machine_shifts[self.machines[i].id] = (
+                                   current_app.config['SHIFT_HOURS'][shift_name]
+                                   )
+                
+        # grab forecast
+        try:
+            forecast = pd.read_html(self.req.get('finalised_forecast_table'))[0]
+        except Exception:
+            # The forecast is added to the form on submission so always present
+            return False
+        
+        try:
+            weeks = forecast.columns[1:]
+            forecast[weeks] = forecast[weeks].astype(int)
+            if len(forecast) != len(current_app.config['PRODUCT_NAMES']):
+                return False
+        except ValueError:
+            return False
+        
+        # Add in an additional "week" so that interpolation starts at 0
+        forecast.insert(1, 'Week 0', 0)
+        
+        # Grab start date for the next Monday
+        today = dt.date.today()
+        days_to_add = 7 - today.weekday()
+        next_monday = today + dt.timedelta(days=days_to_add)
+        date_range = pd.date_range(start=next_monday, periods=5, freq='W-MON')
+        
+        # Transpose the df and get it at hourly granulatity using interpolate
+        forecast = (forecast.set_index('Product Name')
+                            .T
+                            .set_index(pd.DatetimeIndex(date_range))
+                            .cumsum())
+        forecast = forecast.resample(rule='H').interpolate()
+        
+        self.daterange = forecast.index.astype(str).tolist()
+        for product_name in forecast.columns:
+            product_id = int(product_name.split()[1])
+            self.forecast[product_id] = forecast[product_name].tolist()
+        
     @staticmethod
     def create_forecast():
         forecast = []
@@ -388,3 +464,5 @@ class Problem:
                     ])
         
         return forecast
+    
+

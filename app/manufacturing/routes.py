@@ -17,7 +17,7 @@ def update_machine_status():
 def homepage():
     ptv_status = Machines.get_current_status()
     plot = MachineHistory.get_plots('product_count')
-    shifts = current_app.config['SHIFT_PATTERNS']
+    shifts = list(current_app.config['SHIFT_HOURS'].keys())
     machines = current_app.config['MACHINE_NAMES']
     products = current_app.config['PRODUCT_NAMES']
     forecast = Problem.create_forecast()
