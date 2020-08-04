@@ -47,6 +47,7 @@ def create_app(config_class=Config):
     app.config['CUSTOMER_NAMES'] = config_class.load_customer_names()
     app.jinja_env.globals.update(mapbox_key=app.config['MAPBOX_KEY'])
     app.jinja_env.globals.update(leaflet_router=app.config['LEAFLET_SERVER'])
+    app.jinja_env.globals.update(sitekey=app.config['RECAPTCHA_PUBLIC_KEY'])
     
     # Register blueprints
     from app.core import bp as core

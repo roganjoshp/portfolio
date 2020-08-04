@@ -14,13 +14,18 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SESSION_COOKIE_SAMESITE = 'strict'
+    
     DB_PATH = 'app/app.db'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, DB_PATH)
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = 'sqlalchemy'
     SESSION_SQLALCHEMY_TABLE = 'sessions'
+    
+    RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+    RECAPTCHA_PARAMETERS = {'hl': 'zh', 'render': 'explicit'}
+    RECAPTCHA_DATA_ATTRS = {'theme': 'light'}
     
     PERMANENT_SESSION_LIFETIME = 604800
     WTF_CSRF_TIME_LIMIT = None

@@ -1,0 +1,128 @@
+{% extends 'core/base.html' %} 
+{% block title %}
+<h4 class="page-header">About This Site</h4>
+{% endblock %} 
+{% block content %}
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 mb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Overview</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p align="justify">As I said in the intro, one of the aims of this site is to make sure I have a working example of the different technologies I have come to use throughout my career. This page gives a summary of the different libraries and technologies involved in making this site function.
+                       In addition, the code for the site (minus the vehicle routing server) can be found in my <a href="https://github.com/roganjoshp/portfolio" style="color: #265077;" target="_blank"><u>github</u><a> repository.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 mb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">General</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <ul style="list-style: none; padding: 0; list-style-type: none;">
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Web framework:<a href="https://palletsprojects.com/p/flask/" target="_blank" style="color: #265077"> <u>Flask</u></a>,
+                        including <a href="https://flask-wtf.readthedocs.io/en/stable/csrf.html" target="_blank" style="color: #265077"><u>Flask-CSRF</u></a>, 
+                        <a href="https://flask-wtf.readthedocs.io/en/stable/" target="_blank" style="color: #265077"><u>Flask-WTF</u></a> and 
+                        <a href="https://flask-sqlalchemy.palletsprojects.com/en/2.x/" target="_blank" style="color: #265077"><u>Flask-SQLAlchemy</u></a>
+                     </p>
+                  </li>
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Responsive front end layout:<a href="https://getbootstrap.com/" target="_blank" style="color: #265077"> <u>Bootstrap 4</u></a></p>
+                  </li>
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Responsive tables:<a href="https://datatables.net/" target="_blank" style="color: #265077"> <u>DataTables</u></a></p>
+                  </li>
+                  <li>
+                     <p align="justify"><i class="fas fa-angle-right"></i> Data Storage:<a href="https://www.sqlite.org/index.html" target="_blank" style="color: #265077"> <u>SQLite</u> </a> (because only the live production data is stored) 
+                        and with <a href="https://www.sqlalchemy.org/" target="_blank" style="color: #265077"> <u>SQLAlchemy</u> </a>as the Object-relational Mapper (ORM)
+                     </p>
+                  </li>
+                  <li>
+                     <p align="justify"><i class="fas fa-angle-right"></i> Other:<a href="https://jquery.com/" target="_blank" style="color: #265077"> jQuery</a>, HTML, JavaScript and custom CSS</p>
+                  </li>
+               </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 mb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Vehicle Routing</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <ul style="list-style: none; padding: 0; list-style-type: none;">
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Solver:<a href="https://github.com/graphhopper/jsprit" target="_blank" style="color: #265077"> <u>jsprit</u></a>
+                  </li>
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Real-road distances and times: a self-hosted instance of <a href="http://project-osrm.org/" target="_blank" style="color: #265077"> <u>OSRM</u></a>
+                        that generates distance and time matrices
+                     </p>
+                  </li>
+                  <li>
+                     <p align="justify"><i class="fas fa-angle-right"></i> Communication:<a href="https://zeromq.org/" target="_blank" style="color: #265077"> <u>ZeroMQ</u></a>. jsprit
+                        does not include a standard API that is accessible outside of Java. Therefore, I built a custom RESTful API that listens on a socket for 
+                        a problem serialized as JSON. The middleware is capable of formulating and tracking the problem for dynamic routing solutions but this is
+                        too resource-heavy to demonstrate on this site, so some default settings are used.
+                     </p>
+                  </li>
+                  <li>
+                     <p align="justify"><i class="fas fa-angle-right"></i> Mapping: a combination of <a href="https://leafletjs.com/" target="_blank" style="color: #265077"> <u>Leaflet</u></a>, 
+                        <a href="https://www.liedman.net/leaflet-routing-machine/" target="_blank" style="color: #265077"><u>Leaflet Routing Machine</u></a> (utilising the self-hosted OSRM server),
+                        <a href="https://www.mapbox.com/" target="_blank" style="color: #265077"><u>Mapbox</u></a> for the custom tileset and
+                        <a href="https://github.com/Leaflet/Leaflet.Icon.Glyph" target="_blank" style="color: #265077"><u>Leaflet.Icon.Glyph</u></a> for the numbered markers
+                     </p>
+                  </li>
+               </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col col-xs-12">
+            <div class="card pb-0 mb-0 h-100">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Machine Scheduling</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <ul style="list-style: none; padding: 0; list-style-type: none;">
+                  <li>
+                     <p><i class="fas fa-angle-right"></i> Graphing:<a href="https://plot.ly/javascript/" target="_blank" style="color: #265077"> <u>Plotly.js</u></a>
+                  </li>
+                  <li>
+                     <p align="justify"><i class="fas fa-angle-right"></i> Solver: an entirely custom algorithm based on the principles of <a href="https://en.wikipedia.org/wiki/Simulated_annealing" target="_blank" style="color: #265077"> <u>Simulated Annealing</u></a>.
+                        The problem is first transformed in <a href="https://pandas.pydata.org/" target="_blank" style="color: #265077"><u>Pandas</u></a> and rearranged into a series of 
+                        <a href="https://www.numpy.org/" target="_blank" style="color: #265077"> <u>NumPy</u></a> arrays. For a problem of this scale, approximately 10,000 solutions can
+                        be generated and evaluated per second.
+                  </li>
+               </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
