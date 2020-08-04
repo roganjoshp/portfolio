@@ -182,6 +182,22 @@ class Machines(db.Model):
                 
         db.session.commit()
     
+    def reset_status(self):
+        self.history.append(
+            MachineHistory(datetime=dt.datetime.utcnow().replace(minute=0, 
+                                                                 second=0, 
+                                                                 microsecond=0),
+                           product_count=self.status.hourly_product_count,
+                           down_count=self.status.hourly_down_count,
+                           down_secs=self.status.total_secs_down))
+        
+        db.session.commit()
+        
+        self.status.hourly_product_count = 0
+        self.status.hourly_down_count = 0
+        self.status.total_secs_down = 0
+        db.session.commit()
+        
     def get_average_hourly_production(self, lookback_weeks=4):
         MH = MachineHistory
         history = (db.session.query(func.avg(MH.product_count))
@@ -375,49 +391,11 @@ class Machines(db.Model):
     def get_all():
         return Machines.query.order_by('name').all()
 
-
-class SolverHelpers:
-    """ A group of helper functions to support the final solver
-
-    In the full implementation, a large number of additional parameters can be 
-    specified by users:
-        - Production time lost on product switchovers
-        - Minimum hours of production per product before switchover
-        - linked machines that must be making the same product at the same time
-        - exclusive machines where only one from the group can run
-        - product priorities
-        - weekly unit production limits
-        - acceptable levels of stockpiling on a per-product basis
-        - limits to storage capacity for pallets
-        - seasonal products that can be turned off each week
-        - varying shift patterns across departments and across weeks
-        - etc.
-        
-    These are too numerous (and boring) to specify for the user of this demo, so
-    the methods here will make the necessary assumptions and implement defaults
-    in order to allow the solver to run
-    """
-    
-    def __init__(self):
-        pass
-    
-    def build_productivity_array(self, ave_production, shift_overlay, num_weeks):
-        
-        production = np.full(num_weeks * 168, ave_production)
-        expanded_overlay = []
-        week_pattern = []
-        for day in range(7):
-            week_pattern.append(shift_overlay[day])
-        full_pattern = np.repeat(week_pattern, num_weeks)
-        production *= full_pattern
-        return production
-         
               
 class Problem:
     
     def __init__(self, request):
         self.req = request
-        self.helpers = SolverHelpers()
         
         self.machine_products = {} # Product capabilities of each machine
         self.machines = Machines.get_all()
@@ -627,6 +605,18 @@ class Solver:
         
              
     def _get_swap_indices(self):
+        """ Return list of swappable indices for each machine 
+        
+        Given that machines only run for certain periods of the day AND the fact 
+        that there is a minimum amount of time that a machine can run one 
+        product before it can switch again, it's possible to target the indices
+        that are eligible to swap vs. just picking starting indices at random.
+        
+        Swapping at random gives a high chance of swapping in total downtime 
+        (useless) in addition to giving product swaps at weird intervals e.g.
+        one hour into a shift. This method is not without its flaws - it relies
+        on shifts being generally regular in rotation. This is generally true.
+        """
         
         for machine_id, productivity in self.problem.productivity_map.items():
             arr = productivity.nonzero()[0].tolist()

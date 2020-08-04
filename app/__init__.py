@@ -67,8 +67,8 @@ def create_app(config_class=Config):
             
         # Only when schema in place and machines have been bootstrapped, start
         # Also turn off when in debug mode
-        if not os.environ.get('FLASK_DEBUG', False):       
-            scheduler.start()
+        #if not os.environ.get('FLASK_DEBUG', False):       
+        scheduler.start()
         
     except OperationalError:
         print('There are unapplied database migrations')

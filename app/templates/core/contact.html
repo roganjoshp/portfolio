@@ -1,4 +1,5 @@
-{% extends 'core/base.html' %} {% block title %}
+{% extends 'core/base.html' %} 
+{% block title %}
 <h4 class="page-header">Contact</h4>
 {% endblock %} 
 {% block content %}
@@ -19,6 +20,18 @@
         <div class="col col-xs-12">
             <div class="card pb-0 mb-0 h-100">
                 <div class="card-body">
+                    {% with messages = get_flashed_messages() %} 
+                    {% if messages %}
+                    <ul class=flashes>
+                        {% for message in messages %}
+                        <center>
+                            <font color="green">{{ message }}</font>
+                        </center>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %} 
+                    {% endwith %}
                     <form method="post" action="{{ url_for('core.contact_homepage') }}" id="contact_form" autocomplete="off">
                         {{ form.hidden_tag() }}
                         <div class="form-group">
