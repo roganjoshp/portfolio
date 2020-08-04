@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %} {% block title %}
-<h4 class="page-header">Content</h4>
-{% endblock %} {% block content %}
+<h4 class="page-header">Contact</h4>
+{% endblock %} 
+{% block content %}
 <div class="container-fluid content-row">
     <div class="row">
         <div class="col col-xs-12">
@@ -22,8 +23,8 @@
                         {{ form.hidden_tag() }}
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-sm-4 control-label">{{ form.name.label }}</label>
-                                <div class="col-sm-8">
+                                <label class="col-sm-4 control-label pb-0">{{ form.name.label }}</label>
+                                <div class="col-sm-8 pb-0">
                                     {{ form.name(class="form-control") }} 
                                     {% for error in form.name.errors %}
                                     <span style="color: red;">{{ error }}</span> 
@@ -32,8 +33,8 @@
                             </div>
                             <br>
                             <div class="row">
-                                <label class="col-sm-4 control-label">{{ form.email.label }}</label>
-                                <div class="col-sm-8">
+                                <label class="col-sm-4 control-label pb-0">{{ form.email.label }}</label>
+                                <div class="col-sm-8 pb-0">
                                     {{ form.email(class="form-control") }} 
                                     {% for error in form.email.errors %}
                                     <span style="color: red;">{{ error }}</span> 
@@ -42,8 +43,8 @@
                             </div>
                             <br>
                             <div class="row">
-                                <label class="col-sm-4 control-label">{{ form.phone.label }}</label>
-                                <div class="col-sm-8">
+                                <label class="col-sm-4 control-label pb-0">{{ form.phone.label }}</label>
+                                <div class="col-sm-8 pb-0">
                                     {{ form.phone(class="form-control") }}
                                 </div>
                             </div>
