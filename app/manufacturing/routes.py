@@ -61,7 +61,7 @@ def create_problem():
         return jsonify({
             'success': True,
             'response': render_template(
-                    'manufacturing/results_graphs.html',
+                    'manufacturing/results_parent.html',
                     num_panels=int(len(solution['productivity_graphs']) / 2),
                     solution=solution)
             })

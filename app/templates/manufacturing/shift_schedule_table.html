@@ -1,0 +1,53 @@
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col-sm m-0">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Machine Production Schedule</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-sm table-striped" style="width: 100%" id="shift_table">
+                        <thead>
+                            {% for header in solution.shift_table_headers %}
+                            <th>{{ header }}</th>
+                            {% endfor %}
+                        </thead>
+                        <tbody>
+                            {% for row in solution.shift_table %}
+                            <tr>
+                                {% for item in row %} 
+                                   {% if item == 'Offline' %}
+                                      <td>
+                                          <font color="red">{{ item }}</font>
+                                      </td>
+                                   {% else %}
+                                      <td> {{ item }}</td>
+                                   {% endif %} 
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#shift_table').DataTable({
+            "iDisplayLength": 10,
+            "scrollX": false,
+            "bLengthChange": false,
+            "aaSorting": [],
+            "searching": false,
+            "scrollCollapse": false,
+            "scrollY": "420px",
+            "info": false,
+            "responsive": true,
+            "bSort": false
+        });
+    });
+</script>

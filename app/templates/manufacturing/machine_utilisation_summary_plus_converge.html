@@ -1,0 +1,94 @@
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col-sm-6 m-0">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Machine Utilisation</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div id="utilisation_plot"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 m-0">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Solver Convergence</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div id="convergence_plot_div"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+var traces = [];
+   {% for machine in solution.utilisation %}
+    var trace = {
+        x: {{ solution.wc_dates | safe }},
+        y: {{ machine.utilisation | safe }},
+        type: 'scatter',
+        name: '{{ machine.machine_name }}'
+    };
+    traces.push(trace);
+    {% endfor %}
+
+    var layout = {
+        
+        showlegend: true,
+        legend: {
+            x: 0.7,
+            y: 0.1
+        },
+        xaxis: {
+            title: 'W/C Date',
+        },
+        yaxis: {
+            title: 'Utilisation (%)',
+        },
+        margin: {
+            l: 70,
+            r: 40,
+            b: 50,
+            t: 50,
+            pad: 4
+        }
+    };
+    Plotly.newPlot("utilisation_plot", traces, layout, {displayModeBar: false, responsive: true});
+</script>
+<script type="text/javascript">
+    var trace1 = {
+        x: {{ solution.convergence.x | safe }},
+        y: {{ solution.convergence.cost | safe }},
+        type: 'scatter',
+        name: 'Production'
+    };
+    
+    var layout = {
+        
+        legend: {
+            x: 0.7,
+            y: 0.1
+        },
+        xaxis: {
+            title: 'Iteration',
+        },
+        yaxis: {
+            title: 'Cost (Arbitrary unit)',
+        },
+        margin: {
+            l: 70,
+            r: 40,
+            b: 50,
+            t: 50,
+            pad: 4
+        }
+    };
+    Plotly.newPlot("convergence_plot_div", [trace1], layout, {displayModeBar: false, responsive: true});
+</script>

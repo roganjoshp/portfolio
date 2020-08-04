@@ -114,7 +114,7 @@
         </div>
     </div>
 </form>
-<div id="production_graph_div"></div>
+<div id="production_results_div"></div>
 <script>
     function show_spinner() {
         $('#submit_form_div').hide();
@@ -150,19 +150,20 @@
             success: function(data) {
                 hide_spinner();
                 if (data.success == true) {
-                    $("#production_graph_div").html(data.response);
+                    $("#production_results_div").html(data.response);
                     $("html, body").delay(400).animate({
-                        scrollTop: $('#production_graph_div').offset().top
+                        scrollTop: $('#production_results_div').offset().top
                     }, 700);
                 } else {
                     $('#response_message').html(data.response);
-                    $('#production_graph_div').empty();
+                    $('#production_results_div').empty();
                 }
             },
             error: function() {
                 hide_spinner();
                 $('#response_message').html('<center><font color="red">An unknown error has occurred</font></center><br>');
-            }
+            },
+            timeout: 5000
         });
     });
 </script>

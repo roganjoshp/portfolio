@@ -1001,12 +1001,14 @@ class Results:
         
         soln_df['Shift Start'] = (pd.to_datetime(soln_df['Shift Start'])
                                     .dt.strftime('%H:%M %a %d/%m/%y'))
-        
-        return soln_df.values.tolist()
+        headers = soln_df.columns.values.tolist()
+        return soln_df.values.tolist(), headers
     
     def _get_machine_utilisation(self):
         
-        wc_dates = np.array(self.daterange).reshape((-1, 168))[:, :1]
+        wc_dates = (np.array(self.daterange).reshape((-1, 168))[:, :1]
+                                            .ravel()
+                                            .tolist())
         
         utilisation = []
         
@@ -1025,6 +1027,7 @@ class Results:
                                            can_produce, 
                                            out=np.zeros_like(can_produce), 
                                            where=can_produce!=0)
+            weekly_utilisation = (weekly_utilisation * 100).tolist()
             
             utilisation.append({'machine_name': self.machine_name_map[machine_id],
                                 'utilisation': weekly_utilisation})
@@ -1036,8 +1039,8 @@ class Results:
         rtn = {}
         results = []
         
-        shift_table = self._get_shift_rotation()
-        utilisation = self._get_machine_utilisation()
+        shift_table, table_headers = self._get_shift_rotation()
+        utilisation, wc_dates = self._get_machine_utilisation()
         
         for product_id, production in self.best_ever_production.items():
             results.append({
@@ -1047,10 +1050,14 @@ class Results:
                     })
         rtn['productivity_graphs'] = results
         rtn['datetimes'] = self.daterange
-        rtn['convergence'] = {'x': [item[0] for item in self.convergence],
-                              'cost': [item[1] for item in self.convergence]
+        rtn['convergence'] = {'x': [item[0] for item in self.convergence][::20],
+                              'cost': [int(item[1]) for item in self.convergence][::20]
                               }
+        print("x", len(rtn['convergence']['x']))
+        print("cost", len(rtn['convergence']['cost']))
         rtn['shift_table'] = shift_table
+        rtn['shift_table_headers'] = table_headers
         rtn['utilisation'] = utilisation
+        rtn['wc_dates'] = wc_dates
         
         return rtn
