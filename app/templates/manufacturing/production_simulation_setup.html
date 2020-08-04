@@ -68,7 +68,7 @@
                                 <div class="col-lg pt-4 pl-0 pr-0">
                                     <div class="card border-dark h-100 flex-fill">
                                         <div class="card-body">
-                                            <center>Set the sales forecast for the next month</center>
+                                            <center>Set the sales forecast for the next month (1000s of units)</center>
                                             <hr>
                                             <div id="forecast_table_div">
                                                 <table class="table table-bordered table-sm table-striped" style="width: 100%">
@@ -100,7 +100,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg pt-2 pb-0 pl-0 pr-0">
-                                    <button class="btn btn-dark" style="width: 100%">Create Problem</button>
+                                    <button class="btn btn-dark" style="width: 100%">Solve Problem</button>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +110,7 @@
         </div>
     </div>
 </form>
-
+<div id="production_graph_div"></div>
 <script>
     $("#create_problem_form").submit(function(e) {
         e.preventDefault();
@@ -129,7 +129,7 @@
             data: form_data,
             context: form,
             success: function(resp) {
-                $("#dynamic_div").html(resp);
+                $("#production_graph_div").html(resp);
             }
         });
     });

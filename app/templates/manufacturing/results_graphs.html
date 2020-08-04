@@ -1,0 +1,79 @@
+<div class="container-fluid content-row">
+    <div class="row">
+        <div class="col-sm m-0">
+            <div class="card border-dark">
+                <div class="card-header">
+                    <h4>
+                        <p class="header-font">Production Graphs</p>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% for panel in range(num_panels) %}
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg pl-lg-0 pr-lg-2 pb-2 p-0">
+                                <div class="card border-dark">
+                                    <div class="card-body">
+                                        <div id="product_{{ loop.index0 * 2 }}_graph"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg pl-lg-0 pl-lg-2 pb-2 p-0">
+                                <div class="card border-dark h-100 flex-fill">
+                                    <div class="card-body">
+                                        <div id="product_{{ 1 + loop.index0 * 2 }}_graph"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for result in solution.productivity_graphs %}
+<script type="text/javascript">
+    var trace1 = {
+        x: {{ solution.datetimes | safe }},
+        y: {{ result.production | safe }},
+        type: 'scatter',
+        name: 'Production'
+    };
+    var trace2 = {
+        x: {{ solution.datetimes | safe }},
+        y: {{ result.demand | safe }},
+        type: 'scatter',
+        name: 'Demands'
+    };
+    var layout = {
+        title: "{{ result.product_name }}",
+        titlefont: {
+            size: 18,
+        },
+        showlegend: true,
+        legend: {
+            x: 0.7,
+            y: 0.1
+        },
+        xaxis: {
+            title: 'Date',
+        },
+        yaxis: {
+            title: 'Units',
+        },
+        margin: {
+            l: 70,
+            r: 40,
+            b: 50,
+            t: 50,
+            pad: 4
+        }
+    };
+    var data = [trace1, trace2];
+    Plotly.newPlot("product_{{ loop.index0 }}_graph", data, layout, {displayModeBar: false, responsive: true});
+</script>
+
+{% endfor %}

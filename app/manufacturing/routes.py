@@ -2,7 +2,7 @@ from flask import request, render_template, current_app
 
 from app import scheduler
 from app.manufacturing import bp
-from app.manufacturing.models import Machines, MachineHistory, Problem
+from app.manufacturing.models import Machines, MachineHistory, Problem, Solver
 
 
 @scheduler.task('interval', id='update_silos', seconds=3)
@@ -17,7 +17,8 @@ def update_machine_status():
 def homepage():
     ptv_status = Machines.get_current_status()
     plot = MachineHistory.get_plots('product_count')
-    shifts = list(current_app.config['SHIFT_HOURS'].keys())
+    shifts = [item for item in current_app.config['SHIFT_HOURS']
+              if item != 'null']
     machines = current_app.config['MACHINE_NAMES']
     products = current_app.config['PRODUCT_NAMES']
     forecast = Problem.create_forecast()
@@ -50,5 +51,15 @@ def plot_historical_data():
 @bp.route('/create_problem', methods=['POST'])
 def create_problem():
     problem = Problem(request.form)
-    problem.parse_request()
-    return "done"
+    is_valid = problem.parse_request()
+    if is_valid:
+        problem.finalise_build()
+        solver = Solver(problem)
+        solver.run_solver()
+        solution = solver.get_solution()
+        return render_template(
+                    'manufacturing/results_graphs.html',
+                    num_panels=int(len(solution['productivity_graphs']) / 2),
+                    solution=solution
+                    )
+    return False
