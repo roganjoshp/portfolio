@@ -34,52 +34,41 @@
         </div>
     </div>
 </div>
-<div class="container-fluid content-row" id="set_problem_div">
+<div class="container-fluid content-row">
     <div class="row">
-        <div class="col col-lg-12">
+        <div class="col-sm m-0">
             <div class="card border-dark">
-                <div class="card-body p-2">
-                    <div class="container-fluid content-row">
-                        <div class="row align-items-stretch">
-                            <div class="col col-lg-6 d-flex">
-                                <div class="card pb-0 h-100">
-                                    <div class="card-header">
-                                        <h4>
-                                            <p class="header-font">Parameters</p>
-                                        </h4>
-                                    </div>
-                                    <div class="card-body flex-fill">
+
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg pl-lg-0 pr-lg-2 pt-lg-0 pb-lg-0 pb-2 p-0">
+                                <div class="card border-dark">
+                                    <div class="card-body">
                                         {% include 'vehicle_routing/create_problem_form.html' %}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col col-lg-6 d-flex">
-                                <div class="card pb-0 h-100">
-                                    <div class="card-header">
-                                        <h4>
-                                            <p class="header-font">Problem View</p>
-                                        </h4>
-                                    </div>
+                            <div class="col-lg p-0 pl-lg-2 pt-lg-0 pt-2">
+                                <div class="card border-dark h-100 flex-fill">
                                     <div class="card-body flex-fill map-div" id="map">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="solve_problem_div" style="display: none">
-                        <div class="container-fluid content-row">
-                            <div class="row">
-                                <div class="col col-lg-12">
-                                    <button class="btn btn-dark" style="width: 100%;" onclick="solveProblem()">Solve</button>
-                                </div>
+                        <div class="row" id="solve_problem_div" style="display: none">
+                            <div class="col-lg p-0 pt-3">
+                                <button class="btn btn-dark" style="width: 100%;" onclick="solveProblem()">Solve</button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div id="routing_results_div"></div>
 {% include 'vehicle_routing/routing_explanation_modal.html' %}
 <script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
@@ -168,6 +157,4 @@
         });
     }
 </script>
-
-
 {% endblock %}

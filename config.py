@@ -14,7 +14,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config:
     
     SECRET_KEY = os.environ.get('SECRET_KEY')
-
+    SESSION_COOKIE_SAMESITE = 'strict'
     DB_PATH = 'app/app.db'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, DB_PATH)
     
