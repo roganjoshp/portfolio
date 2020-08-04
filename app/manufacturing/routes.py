@@ -2,7 +2,7 @@ from flask import request, render_template, current_app, jsonify
 
 from app import scheduler
 from app.manufacturing import bp
-from app.manufacturing.models import Machines, MachineHistory, Problem, Solver
+from app.manufacturing.models import Machines, MachineHistory, Problem, Solver, Results
 
 
 @scheduler.task('interval', id='update_silos', seconds=3)
@@ -56,7 +56,8 @@ def create_problem():
         problem.finalise_build()
         solver = Solver(problem)
         solver.run_solver()
-        solution = solver.get_solution()
+        results = Results(solver)
+        solution = results.get_solution()
         return jsonify({
             'success': True,
             'response': render_template(

@@ -499,7 +499,8 @@ class Problem:
                             .cumsum())
         forecast = forecast.resample(rule='H').interpolate()
         
-        self.daterange = forecast.index.astype(str).tolist()[1:]
+        self.daterange = forecast.index.astype(str).tolist()[:-1]
+        
         for product_name in forecast.columns:
             product_id = int(product_name.split()[1])
             self.forecast[product_id] = forecast[product_name].values
@@ -513,8 +514,12 @@ class Problem:
         expanded_overlay = []
         week_pattern = []
         for day in range(7):
-            week_pattern.append(shift_overlay[day])
-        full_pattern = np.repeat(week_pattern, num_weeks)
+            week_pattern.extend(shift_overlay[day])
+        
+        full_pattern = []
+        for x in range(num_weeks):
+            full_pattern.extend(week_pattern)
+        
         production *= full_pattern
         return production
     
@@ -533,7 +538,8 @@ class Problem:
             # Add the productivity but scale down by 1000 to match the units 
             # that the forecast is specified in
             self.productivity_map[machine.id] = expanded / 1000
-     
+            df = pd.DataFrame(self.productivity_map)
+            
     def finalise_build(self):
         self._build_productivity_map()
         
@@ -605,6 +611,7 @@ class Solver:
 
         self.best_ever_cost = np.inf
         self.best_ever_production = {}
+        self.best_ever_solution = {}
         
         # To store what a machine could be making at any time
         self.productivity_map = deepcopy(self.problem.productivity_map)
@@ -892,6 +899,7 @@ class Solver:
         best_ever_cost = current_best_cost
         
         self.best_ever_production = deepcopy(self.wip_production)
+        self.best_ever_solution = deepcopy(self.solution)
         
         for x in range(self.iterations):
             
@@ -936,6 +944,7 @@ class Solver:
                 if new_cost < best_ever_cost:
                     best_ever_cost = new_cost
                     self.best_ever_production = deepcopy(self.wip_production)
+                    self.best_ever_solution = deepcopy(self.solution)
             
             else:
                 acceptance = exp(
@@ -963,23 +972,85 @@ class Solver:
         self._generate_profiles()
         self._run_solution_loop()   
     
+    
+class Results:
+    
+    def __init__(self, solved_problem):
+        
+        self.solver = solved_problem
+        self.daterange = self.solver.problem.daterange
+        self.product_name_map = self.solver.problem.product_name_map
+        self.product_name_map[0] = 'Offline'
+        self.convergence = self.solver.convergence
+        self.wip_demands = self.solver.wip_demands
+        self.best_ever_production = self.solver.best_ever_production
+        self.best_ever_solution = self.solver.best_ever_solution
+        self.productivity_map = self.solver.productivity_map
+        
+        self.machine_name_map = dict(zip(self.solver.machine_ids,
+                                     current_app.config['MACHINE_NAMES'])
+                                    )
+       
+    def _get_shift_rotation(self):
+        
+        soln_df = pd.DataFrame(self.best_ever_solution)
+        soln_df = soln_df.rename(columns=self.machine_name_map)
+        soln_df = soln_df.applymap(self.product_name_map.get)
+        soln_df.insert(0, 'Shift Start', self.daterange)
+        soln_df = soln_df.iloc[6:].iloc[::8, :]
+        
+        soln_df['Shift Start'] = (pd.to_datetime(soln_df['Shift Start'])
+                                    .dt.strftime('%H:%M %a %d/%m/%y'))
+        
+        return soln_df.values.tolist()
+    
+    def _get_machine_utilisation(self):
+        
+        wc_dates = np.array(self.daterange).reshape((-1, 168))[:, :1]
+        
+        utilisation = []
+        
+        for machine_id, possible_production in self.productivity_map.items():
+            actual_production = self.best_ever_solution[machine_id]
+            can_produce = (np.where(possible_production > 0, 1, 0)
+                             .reshape((-1, 168))
+                             .sum(axis=1)
+                             .astype(float))
+            did_produce = (np.where(actual_production > 0, 1, 0)
+                             .reshape((-1, 168))
+                             .sum(axis=1)
+                             .astype(float))
+            
+            weekly_utilisation = np.divide(did_produce, 
+                                           can_produce, 
+                                           out=np.zeros_like(can_produce), 
+                                           where=can_produce!=0)
+            
+            utilisation.append({'machine_name': self.machine_name_map[machine_id],
+                                'utilisation': weekly_utilisation})
+            
+        return utilisation, wc_dates
+     
     def get_solution(self):
         
         rtn = {}
         results = []
+        
+        shift_table = self._get_shift_rotation()
+        utilisation = self._get_machine_utilisation()
+        
         for product_id, production in self.best_ever_production.items():
             results.append({
-                    'product_name': self.problem.product_name_map[product_id],
+                    'product_name': self.product_name_map[product_id],
                     'demand': self.wip_demands[product_id].astype(int).tolist(),
                     'production': production.astype(int).tolist()
                     })
         rtn['productivity_graphs'] = results
-        rtn['datetimes'] = self.problem.daterange
+        rtn['datetimes'] = self.daterange
         rtn['convergence'] = {'x': [item[0] for item in self.convergence],
                               'cost': [item[1] for item in self.convergence]
                               }
+        rtn['shift_table'] = shift_table
+        rtn['utilisation'] = utilisation
         
         return rtn
-            
-        
-

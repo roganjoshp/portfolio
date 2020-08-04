@@ -141,6 +141,7 @@
 
         $('#response_message').empty();
         show_spinner();
+
         $.ajax({
             type: "POST",
             url: url,
@@ -157,6 +158,10 @@
                     $('#response_message').html(data.response);
                     $('#production_graph_div').empty();
                 }
+            },
+            error: function() {
+                hide_spinner();
+                $('#response_message').html('<center><font color="red">An unknown error has occurred</font></center><br>');
             }
         });
     });
