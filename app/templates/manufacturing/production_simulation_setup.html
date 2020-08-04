@@ -100,7 +100,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg pt-2 pb-0 pl-0 pr-0">
-                                    <button class="btn btn-dark" style="width: 100%">Solve Problem</button>
+                                    <div id="response_message"></div>
+                                    <center>
+                                        <div class="loader" id="spinner_div" style="display: none;"></div>
+                                    </center>
+                                    <div id="submit_form_div"><button class="btn btn-dark" style="width: 100%">Solve Problem</button></div>
                                 </div>
                             </div>
                         </div>
@@ -111,6 +115,18 @@
     </div>
 </form>
 <div id="production_graph_div"></div>
+<script>
+    function show_spinner() {
+        $('#submit_form_div').hide();
+        $('#spinner_div').show();
+    }
+</script>
+<script>
+    function hide_spinner() {
+        $('#submit_form_div').show();
+        $('#spinner_div').hide();
+    }
+</script>
 <script>
     $("#create_problem_form").submit(function(e) {
         e.preventDefault();
@@ -123,13 +139,24 @@
             value: document.getElementById("forecast_table_div").innerHTML
         });
 
+        $('#response_message').empty();
+        show_spinner();
         $.ajax({
             type: "POST",
             url: url,
             data: form_data,
             context: form,
-            success: function(resp) {
-                $("#production_graph_div").html(resp);
+            success: function(data) {
+                hide_spinner();
+                if (data.success == true) {
+                    $("#production_graph_div").html(data.response);
+                    $("html, body").delay(400).animate({
+                        scrollTop: $('#production_graph_div').offset().top
+                    }, 700);
+                } else {
+                    $('#response_message').html(data.response);
+                    $('#production_graph_div').empty();
+                }
             }
         });
     });

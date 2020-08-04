@@ -1,4 +1,4 @@
-from flask import request, render_template, current_app
+from flask import request, render_template, current_app, jsonify
 
 from app import scheduler
 from app.manufacturing import bp
@@ -51,15 +51,20 @@ def plot_historical_data():
 @bp.route('/create_problem', methods=['POST'])
 def create_problem():
     problem = Problem(request.form)
-    is_valid = problem.parse_request()
+    is_valid, message = problem.parse_request()
     if is_valid:
         problem.finalise_build()
         solver = Solver(problem)
         solver.run_solver()
         solution = solver.get_solution()
-        return render_template(
+        return jsonify({
+            'success': True,
+            'response': render_template(
                     'manufacturing/results_graphs.html',
                     num_panels=int(len(solution['productivity_graphs']) / 2),
-                    solution=solution
-                    )
-    return False
+                    solution=solution)
+            })
+    return jsonify({
+        'success': False,
+        'response': f'<center><font color="red">{ message }</font></center><br>'
+        })

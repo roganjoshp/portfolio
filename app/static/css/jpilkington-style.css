@@ -324,7 +324,7 @@ a.article:hover {
 .loader {
     border: 3px solid #f3f3f3;
     /* Light grey */
-    border-top: 3px solid #022140;
+    border-top: 3px solid var(--color_3);
     border-radius: 50%;
     width: 35px;
     height: 35px;

@@ -449,13 +449,13 @@ class Problem:
                 # grab an int. Anything else is not to be trusted
                 product_list = [int(item.split()[1]) for item in product_list]
                 if any(item not in valid_product_ids for item in product_list):
-                    return False
+                    return False, "Unable to recognise product ID"
                 self.machine_products[self.machines[i].id] = product_list
                 self.machine_productivity[self.machines[i].id] = (
                                 self.machines[i].get_average_hourly_production()
                                 )
             except Exception:
-                return False
+                return False, "Invalid product name"
             
         # Grab the shift pattern hours
         for i, machine in enumerate(current_app.config['MACHINE_NAMES']):
@@ -470,15 +470,15 @@ class Problem:
             forecast = pd.read_html(self.req.get('finalised_forecast_table'))[0]
         except Exception:
             # The forecast is added to the form on submission so always present
-            return False
+            return False, "Unknown error reading forecast"
         
         try:
             weeks = forecast.columns[1:]
             forecast[weeks] = forecast[weeks].astype(int)
             if len(forecast) != len(current_app.config['PRODUCT_NAMES']):
-                return False
+                return False, "Forecast length does not match product list"
         except ValueError:
-            return False
+            return False, "Forecast entries must be numeric"
         
         # Add in an additional "week" so that interpolation starts at 0
         forecast.insert(1, 'Week 0', 0)
@@ -504,7 +504,7 @@ class Problem:
             product_id = int(product_name.split()[1])
             self.forecast[product_id] = forecast[product_name].values
         
-        return True
+        return True, 'success'
     
     def _build_productivity_array(self, ave_production, shift_overlay, 
                                   num_weeks):
