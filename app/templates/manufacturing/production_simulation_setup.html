@@ -17,6 +17,25 @@
                         <p align="justify">In the panels below, you can make changes to the problem setup and try and solve the problem. You can define which machines make which products, alter the shift patterns of the machines, and define the sales forecast for the coming
                             month. The model will use the production history recorded above in order to determine the output of each machine.
                         </p>
+                        <p align="justify">
+                            The model outputs will show:
+                            <ul>
+                                <li>
+                                    The forecasted demand and the machine output to meet the forecast based on their shift patterns and manufacturing schedule
+                                </li>
+                                <li>
+                                    A schedule table showing what product each machine should make for each shift
+                                </li>
+                                <li>
+                                    A weekly summary of machine utilisation. Utilisation is based only on the shifts that a machine is scheduled to run; the absolute utilisation would be much lower. If the model starts over-producing, the machines will be switched off, indicating that fewer
+                                    shifts can be used to meet the forecast
+                                </li>
+                                <li>
+                                    A graph of solver convergence. The initial, randomised solution will likely be poor at meeting the forecast and will have a high cost. As the solver progresses, the cost will come down and eventually flatline, indicating that no further improvements can
+                                    be made
+                                </li>
+                            </ul>
+                        </p>
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-lg pl-lg-0 pr-lg-2 pt-lg-0 pb-lg-0 pb-2 p-0">

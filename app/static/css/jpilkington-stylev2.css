@@ -87,6 +87,7 @@ a:focus {
     top: 0;
     left: 0;
     height: 100vh;
+    overflow-y: auto;
     z-index: 999;
     background: var(--color_1);
     color: #fff;

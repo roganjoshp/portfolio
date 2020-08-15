@@ -183,6 +183,15 @@ class Machines(db.Model):
         db.session.commit()
     
     def reset_status(self):
+        
+        # Clear out old data
+        cutoff = dt.date.today() - dt.timedelta(weeks=12)
+        old = (MachineHistory.query
+                             .filter(and_(MachineHistory.datetime<=cutoff,
+                                          MachineHistory.machine_id==self.id))
+                             .delete())
+        db.session.commit()
+        
         self.history.append(
             MachineHistory(datetime=dt.datetime.utcnow().replace(minute=0, 
                                                                  second=0, 

@@ -1,11 +1,3 @@
-<style>
-    .scrollable-menu {
-        height: auto;
-        max-height: 560px;
-        overflow-x: hidden;
-    }
-</style>
-
 <nav id="sidebar">
     <div class="sidebar-header">
         <center><img src="{{ url_for('static', filename='img/profile.png') }}" width="60%"></img>
@@ -18,7 +10,7 @@
             <center>Data Scientist</center>
         </h6>
     </div>
-    <ul class="list-unstyled components scrollable-menu">
+    <ul class="list-unstyled components">
         <hr color="white" style="margin-top: 2px; margin-bottom: 2px">
         <li>
             <a href="{{ url_for('core.homepage') }}">Home</a>
