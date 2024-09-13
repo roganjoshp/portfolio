@@ -82,13 +82,13 @@ class MachineHistory(db.Model):
         # Pass query off to raw, to avoid ORM overhead. No need for it here
         data = db.session.execute(
             f"""
-                       SELECT machines.name AS name, 
-                              machine_history.datetime,
-                              machine_history.{stat_name} 
-                       FROM machine_history
-                       JOIN machines ON machines.id = machine_history.machine_id
-                       ORDER BY name, machine_history.datetime
-                       """
+            SELECT machines.name AS name, 
+                    machine_history.datetime,
+                    machine_history.{stat_name} 
+            FROM machine_history
+            JOIN machines ON machines.id = machine_history.machine_id
+            ORDER BY name, machine_history.datetime
+            """
         ).fetchall()
 
         df = pd.DataFrame(data, columns=["name", "datetime", "value"])
@@ -96,11 +96,11 @@ class MachineHistory(db.Model):
         if stat == "oee":
             ideal_run_rates = db.session.execute(
                 """
-                         SELECT machines.name AS name,
-                                machine_stats.ideal_run_rate
-                         FROM machine_stats
-                         JOIN machines ON machines.id = machine_stats.machine_id
-                         """
+                SELECT machines.name AS name,
+                    machine_stats.ideal_run_rate
+                FROM machine_stats
+                JOIN machines ON machines.id = machine_stats.machine_id
+                """
             ).fetchall()
 
             mapper = {
