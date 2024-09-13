@@ -4,11 +4,11 @@ from wtforms.validators import DataRequired, Email
 
 
 class ContactForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email Address', validators=[DataRequired(),
-                                                     Email()])
-    phone = StringField('Phone (optional)')
-    message = TextAreaField('Message', validators=[DataRequired()],
-                            render_kw={'rows': 5})
+    name = StringField("Name", validators=[DataRequired()])
+    email = StringField("Email Address", validators=[DataRequired(), Email()])
+    phone = StringField("Phone (optional)")
+    message = TextAreaField(
+        "Message", validators=[DataRequired()], render_kw={"rows": 5}
+    )
     recaptcha = RecaptchaField()
-    submit = SubmitField('Send Message')
+    submit = SubmitField("Send Message")
